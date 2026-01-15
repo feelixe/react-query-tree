@@ -1,10 +1,10 @@
 import { type DefaultError, mutationOptions, type UseMutationOptions } from "@tanstack/react-query";
 
-export const mutationBrand = {
-	"~type": "mutation",
-} as const;
+export type MutationBrand = { "~type": "mutation" };
 
-export type MutationBrand = typeof mutationBrand;
+export const mutationBrand: MutationBrand = {
+	"~type": "mutation",
+};
 
 export function mutation<
 	TData = unknown,

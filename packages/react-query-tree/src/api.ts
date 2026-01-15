@@ -1,61 +1,151 @@
-import type { MutationKey, QueryKey, UseMutationOptions } from "@tanstack/react-query";
+import type {
+	DefinedInitialDataOptions,
+	MutationKey,
+	QueryKey,
+	UndefinedInitialDataOptions,
+	UnusedSkipTokenOptions,
+	UseMutationOptions,
+} from "@tanstack/react-query";
 import { type MutationBrand, mutationBrand } from "mutation";
 import { type QueryBrand, queryBrand } from "query";
+import { mergeMutationOptions } from "utils";
 import type { DeepPartial } from "./types";
 
-export type Collection<T> = {
-	[K in keyof T]: T[K] extends QueryBrand
-		? T[K]
-		: T[K] extends MutationBrand
-			? T[K]
-			: T[K] extends (...args: any[]) => any
-				? ReturnType<T[K]> extends QueryBrand
-					? T[K]
-					: never
-				: T[K] extends Record<string, any>
-					? Collection<T[K]>
-					: never;
+export type Collection = {
+	[key: string]: QueryBrand | MutationBrand | ((filter: any) => QueryBrand) | Collection;
 };
 
-export type OutputApi<T extends Collection<any>> = {
-	[K in keyof T]: T[K] extends QueryBrand
+type Query<T> =
+	T extends Omit<
+		DefinedInitialDataOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+		"queryKey"
+	>
 		? {
-				queryOptions: () => T[K] & { queryKey: QueryKey };
+				queryOptions: <TInnerData = TData>(
+					opts?: Partial<
+						Omit<DefinedInitialDataOptions<TQueryFnData, TError, TInnerData>, "queryKey">
+					>,
+				) => Omit<DefinedInitialDataOptions<TQueryFnData, TError, TInnerData>, "queryKey"> & {
+					queryKey: QueryKey;
+				};
 				queryKey: () => QueryKey;
 				pathKey: () => string[];
 			}
-		: T[K] extends Omit<
-					UseMutationOptions<infer TData, infer TError, infer TVariables, infer TContext>,
-					"mutationKey"
+		: T extends Omit<
+					UnusedSkipTokenOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+					"queryKey"
 				>
 			? {
-					mutationOptions: <TInnerContext = TContext>(
-						opts?: Omit<
-							UseMutationOptions<TData, TError, TVariables, TInnerContext>,
-							"mutationKey" | "mutationFn"
-						>,
-					) => Omit<UseMutationOptions<TData, TError, TVariables, TContext>, "mutationKey"> & {
-						mutationKey: MutationKey;
+					queryOptions: <TInnerData = TData>(
+						opts?: Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TInnerData>, "queryKey">,
+					) => Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TInnerData>, "queryKey"> & {
+						queryKey: QueryKey;
 					};
-					mutationKey: () => MutationKey;
+					queryKey: () => QueryKey;
 					pathKey: () => string[];
 				}
-			: T[K] extends (...args: any[]) => any
+			: T extends Omit<
+						UndefinedInitialDataOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+						"queryKey"
+					>
 				? {
-						queryOptions: (...args: Parameters<T[K]>) => ReturnType<T[K]> & { queryKey: QueryKey };
-						queryKey: (...args: DeepPartial<Parameters<T[K]>>) => QueryKey;
+						queryOptions: <TInnerData = TData>(
+							opts?: Omit<
+								UndefinedInitialDataOptions<TQueryFnData, TError, TInnerData>,
+								"queryKey"
+							>,
+						) => Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TInnerData>, "queryKey"> & {
+							queryKey: QueryKey;
+						};
+						queryKey: () => QueryKey;
 						pathKey: () => string[];
 					}
+				: never;
+
+type QueryWithFilter<T extends (filter: any) => any> =
+	ReturnType<T> extends Omit<
+		DefinedInitialDataOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+		"queryKey"
+	>
+		? {
+				queryOptions: <TInnerData = TData>(
+					filter: Parameters<T>[0],
+					opts?: Partial<
+						Omit<DefinedInitialDataOptions<TQueryFnData, TError, TInnerData>, "queryKey">
+					>,
+				) => ReturnType<T> & { queryKey: QueryKey };
+				queryKey: (filter?: DeepPartial<Parameters<T>[0]>) => QueryKey;
+				pathKey: () => string[];
+			}
+		: ReturnType<T> extends Omit<
+					UnusedSkipTokenOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+					"queryKey"
+				>
+			? {
+					queryOptions: <TInnerData = TData>(
+						filter: Parameters<T>[0],
+						opts?: Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TInnerData>, "queryKey">,
+					) => ReturnType<T> & { queryKey: QueryKey };
+					queryKey: (filter?: DeepPartial<Parameters<T>[0]>) => QueryKey;
+					pathKey: () => string[];
+				}
+			: ReturnType<T> extends Omit<
+						UndefinedInitialDataOptions<infer TQueryFnData, infer TError, infer TData> & QueryBrand,
+						"queryKey"
+					>
+				? {
+						queryOptions: <TInnerData = TData>(
+							filter: Parameters<T>[0],
+							opts?: Omit<
+								UndefinedInitialDataOptions<TQueryFnData, TError, TInnerData>,
+								"queryKey"
+							>,
+						) => ReturnType<T> & { queryKey: QueryKey };
+						queryKey: (filter?: DeepPartial<Parameters<T>[0]>) => QueryKey;
+						pathKey: () => string[];
+					}
+				: never;
+
+type Mutation<T> =
+	T extends Omit<
+		UseMutationOptions<infer TData, infer TError, infer TVariables, infer TContext>,
+		"mutationKey"
+	>
+		? {
+				mutationOptions: <TInnerContext = TContext>(
+					opts?: Omit<
+						UseMutationOptions<TData, TError, TVariables, TInnerContext>,
+						"mutationKey" | "mutationFn"
+					>,
+				) => Omit<UseMutationOptions<TData, TError, TVariables, TContext>, "mutationKey"> & {
+					mutationKey: MutationKey;
+				};
+				mutationKey: () => MutationKey;
+				pathKey: () => string[];
+			}
+		: never;
+
+export type OutputApi<T extends Collection> = {
+	[K in keyof T]: T[K] extends { "~type": "query" }
+		? Query<T[K]>
+		: T[K] extends { "~type": "mutation" }
+			? Mutation<T[K]>
+			: T[K] extends (filter: any) => any
+				? QueryWithFilter<T[K]>
 				: T[K] extends Record<string, any>
 					? OutputApi<T[K]> & { pathKey: () => string[] }
 					: never;
 };
 
-export const createCollection = <T extends Collection<T>>(config: T): T => {
+export const createCollection = <T extends Collection>(config: T): T => {
 	return config;
 };
 
-export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
+type Prettify<T> = {
+	[K in keyof T]: T[K];
+} & {};
+
+export function createClient<T extends Collection>(config: T): Prettify<OutputApi<T>> {
 	const createProxy = (proxyTarget: any, path: string[] = []): any => {
 		return new Proxy(proxyTarget, {
 			get(obj, prop) {
@@ -71,7 +161,7 @@ export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
 
 				if (value && typeof value === "object" && value["~type"] === queryBrand["~type"]) {
 					return {
-						queryOptions: () => ({ ...value, queryKey: currentPath }),
+						queryOptions: (opts?: any) => ({ ...value, queryKey: currentPath, ...opts }),
 						queryKey: () => currentPath,
 						pathKey: () => currentPath,
 					};
@@ -79,7 +169,8 @@ export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
 
 				if (value && typeof value === "object" && value["~type"] === mutationBrand["~type"]) {
 					return {
-						mutationOptions: () => ({ ...value, mutationKey: currentPath }),
+						mutationOptions: (opts?: any) =>
+							mergeMutationOptions(value, { mutationKey: currentPath }, opts),
 						mutationKey: () => currentPath,
 						pathKey: () => currentPath,
 					};
@@ -87,11 +178,12 @@ export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
 
 				if (typeof value === "function") {
 					return {
-						queryOptions: (...args: any[]) => ({
-							...value(...args),
-							queryKey: [...currentPath, ...args],
+						queryOptions: (filter: any, opts?: any) => ({
+							...value(filter),
+							queryKey: [...currentPath, filter],
+							...opts,
 						}),
-						queryKey: (...args: any[]) => [...currentPath, ...args],
+						queryKey: (filter?: any) => [...currentPath, filter],
 						pathKey: () => currentPath,
 					};
 				}

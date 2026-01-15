@@ -7,20 +7,14 @@ import {
 	type UnusedSkipTokenOptions,
 } from "@tanstack/react-query";
 
+export type QueryBrand = {
+	"~type": "query";
+};
+
 export const queryBrand = {
 	"~type": "query",
-} as const;
+};
 
-export type QueryBrand = typeof queryBrand;
-
-export function query<
-	TQueryFnData = unknown,
-	TError = DefaultError,
-	TData = TQueryFnData,
-	TQueryKey extends QueryKey = QueryKey,
->(
-	options: Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
-): Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & QueryBrand;
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -29,6 +23,14 @@ export function query<
 >(
 	options: Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
 ): Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & QueryBrand;
+export function query<
+	TQueryFnData = unknown,
+	TError = DefaultError,
+	TData = TQueryFnData,
+	TQueryKey extends QueryKey = QueryKey,
+>(
+	options: Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
+): Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & QueryBrand;
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -46,8 +48,8 @@ export function query<
 >(
 	options: any,
 ): (
-	| Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
 	| Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
+	| Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
 	| Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
 ) &
 	QueryBrand {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { createClient } from "../api";
 import { mutation } from "../mutation";
 import { query } from "../query";
@@ -129,5 +129,44 @@ describe("createApi", () => {
 			},
 		});
 		expect(api.auth.users.pathKey()).toEqual(["auth", "users"]);
+	});
+
+	it("merges mutation options", () => {
+		const api = createClient({
+			auth: {
+				login: mutation({
+					mutationFn: async (vars: { id: number }) => vars,
+					gcTime: 100,
+				}),
+			},
+		});
+		const res = api.auth.login.mutationOptions({
+			gcTime: 200,
+		});
+
+		expect(res).toHaveProperty("gcTime", 200);
+	});
+
+	it("merges mutation options functions", () => {
+		const baseOnSuccess = mock();
+		const argumentOnSuccess = mock();
+
+		const api = createClient({
+			auth: {
+				login: mutation({
+					mutationFn: async () => Promise.resolve(null),
+					onSuccess: baseOnSuccess,
+				}),
+			},
+		});
+
+		const res = api.auth.login.mutationOptions({
+			onSuccess: argumentOnSuccess,
+		});
+
+		res.onSuccess?.(null as any, null as any, null as any, null as any);
+
+		expect(baseOnSuccess).toHaveBeenCalled();
+		expect(argumentOnSuccess).toHaveBeenCalled();
 	});
 });
