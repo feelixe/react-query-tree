@@ -8,7 +8,7 @@
 		"dev": "bun run --filter ./apps/* dev",
 		"lint": "biome lint",
 		"format": "biome format",
-		"publish": "bun run publish.ts"
+		"tag-and-release": "bun run tag-and-release.ts"
 	},
 	"workspaces": {
 		"packages": [
