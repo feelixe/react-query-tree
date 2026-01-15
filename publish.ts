@@ -31,7 +31,7 @@ async function build() {
 }
 
 async function publishToNpm(npmTag: string) {
-	await $`cd packages/react-query-tree && bun publish --tag ${npmTag}`;
+	await $`cd packages/react-query-tree && npm publish --tag ${npmTag}`;
 }
 
 async function tagAndPush(version: string) {
