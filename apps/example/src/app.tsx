@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { api } from "./api";
 
 export function App() {
-	const postsQuery = useSuspenseQuery(api.authors);
+	const postsQuery = useSuspenseQuery(api.authors.list.queryOptions());
 	const authorQuery = useSuspenseQuery(api.authors.retrieve.queryOptions(1));
 
 	return (

@@ -6,10 +6,10 @@ import type {
 	UnusedSkipTokenOptions,
 	UseMutationOptions,
 } from "@tanstack/react-query";
-import { type MutationBrand, mutationBrand } from "mutation";
-import { type QueryBrand, queryBrand } from "query";
-import { mergeMutationOptions } from "utils";
+import { type MutationBrand, mutationBrand } from "./mutation";
+import { type QueryBrand, queryBrand } from "./query";
 import type { DeepPartial } from "./types";
+import { mergeMutationOptions } from "./utils";
 
 export type Collection = {
 	[key: string]: QueryBrand | MutationBrand | ((filter: any) => QueryBrand) | Collection;

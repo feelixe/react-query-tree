@@ -1,23 +1,24 @@
 import { createClient, mutation, query } from "react-query-tree";
+import { getAuthorById, listAuthors, listPosts } from "./db";
 
 export const api = createClient({
 	authors: {
 		list: query({
 			queryFn: () => {
-				return 123;
+				return listAuthors();
 			},
 		}),
 		retrieve: (id: number) =>
 			query({
 				queryFn: () => {
-					return id;
+					return getAuthorById(id);
 				},
 			}),
 	},
 	posts: {
 		list: query({
 			queryFn: () => {
-				return 123;
+				return listPosts();
 			},
 		}),
 		create: mutation({
