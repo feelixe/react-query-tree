@@ -1,0 +1,30 @@
+{
+	"name": "react-query-tree-monorepo",
+	"type": "module",
+	"private": true,
+	"module": "./src/index.ts",
+	"scripts": {
+		"build": "bun run --filter ./packages/* build",
+		"dev": "bun run --filter ./apps/* dev",
+		"lint": "biome lint",
+		"format": "biome format",
+		"publish": "bun run publish.ts"
+	},
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		],
+		"catalog": {
+			"@biomejs/biome": "2.3.11",
+			"@types/bun": "latest",
+			"typescript": "^5"
+		}
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@types/bun": "catalog:",
+		"semver": "^7.7.3",
+		"typescript": "catalog:"
+	}
+}

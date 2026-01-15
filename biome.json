@@ -1,0 +1,107 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"**/*.{ts,tsx,js,jsx,json,mjs}",
+			"!**/*.gen.ts",
+			"!**/.git",
+			"!!**/node_modules",
+			"!!**/dist",
+			"!!**/.sst"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"includes": ["**/*.{ts,tsx,js,jsx,json,mjs}"]
+	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"linter": {
+		"enabled": true,
+		"domains": {
+			"react": "all"
+		},
+		"rules": {
+			"recommended": true,
+			"style": {
+				"useComponentExportOnlyModules": "off",
+				"noNonNullAssertion": "off",
+				"useFilenamingConvention": {
+					"level": "error",
+					"options": {
+						"filenameCases": ["kebab-case"]
+					}
+				},
+				"noParameterAssign": "error",
+				"useAsConstAssertion": "error",
+				"useDefaultParameterLast": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"noUselessElse": "error"
+			},
+			"nursery": {
+				"noFloatingPromises": "error",
+				"noShadow": "error"
+			},
+			"a11y": {
+				"useSemanticElements": "off",
+				"noSvgWithoutTitle": "off",
+				"useMediaCaption": "off"
+			},
+			"suspicious": {
+				"noConfusingVoidType": "off",
+				"noExplicitAny": "off",
+				"useAwait": "error",
+				"noNonNullAssertedOptionalChain": "off",
+				"noConsole": {
+					"level": "error",
+					"options": {
+						"allow": [
+							"error",
+							"info",
+							"warn",
+							"groupCollapsed",
+							"trace",
+							"groupEnd"
+						]
+					}
+				}
+			},
+			"correctness": {
+				"noUnusedImports": "error",
+				"useExhaustiveDependencies": "error",
+				"useUniqueElementIds": "off",
+				"noNestedComponentDefinitions": "off",
+				"noChildrenProp": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"lineWidth": 100
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["apps/*/src/routes/**/*.tsx"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useFilenamingConvention": "off"
+					}
+				}
+			}
+		}
+	]
+}

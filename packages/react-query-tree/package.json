@@ -1,0 +1,34 @@
+{
+	"name": "react-query-tree",
+	"type": "module",
+	"version": "0.0.1",
+	"main": "dist/index.js",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "rm -rf dist && tsc",
+		"dev": "tsc -w --incremental --preserveWatchOutput"
+	},
+	"files": [
+		"dist",
+		"package.json",
+		"README.md",
+		"LICENSE"
+	],
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@tanstack/react-query": "^5.90.16",
+		"react": "19.2.3",
+		"react-dom": "19.2.3",
+		"@types/react": "19.2.3",
+		"@types/react-dom": "19.2.3",
+		"@biomejs/biome": "catalog:"
+	},
+	"peerDependencies": {
+		"@tanstack/react-query": "^5.0.0"
+	}
+}
