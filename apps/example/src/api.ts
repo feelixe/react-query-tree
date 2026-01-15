@@ -1,5 +1,5 @@
-import { createClient, createCollection, query } from "react-query-tree";
-import { getAuthorById, listAuthors, listPosts } from "./db";
+import { createClient, createCollection, mutation, query } from "react-query-tree";
+import { createPost, getAuthorById, listAuthors, listPosts } from "./db";
 
 const authorsCollection = createCollection({
 	list: query({
@@ -19,6 +19,11 @@ const postsCollection = createCollection({
 	list: query({
 		queryFn: async () => {
 			return await listPosts();
+		},
+	}),
+	create: mutation({
+		mutationFn: async (args: { title: string; content: string; authorId: number }) => {
+			return await createPost(args);
 		},
 	}),
 });

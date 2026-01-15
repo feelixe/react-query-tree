@@ -1,13 +1,15 @@
-import type { MutationKey, QueryKey } from "@tanstack/react-query";
+import type { MutationKey, QueryKey, UseMutationOptions } from "@tanstack/react-query";
+import { type MutationBrand, mutationBrand } from "mutation";
+import { type QueryBrand, queryBrand } from "query";
 import type { DeepPartial } from "./types";
 
 export type Collection<T> = {
-	[K in keyof T]: T[K] extends { "~type": "query" }
+	[K in keyof T]: T[K] extends QueryBrand
 		? T[K]
-		: T[K] extends { "~type": "mutation" }
+		: T[K] extends MutationBrand
 			? T[K]
 			: T[K] extends (...args: any[]) => any
-				? ReturnType<T[K]> extends { "~type": "query" }
+				? ReturnType<T[K]> extends QueryBrand
 					? T[K]
 					: never
 				: T[K] extends Record<string, any>
@@ -16,15 +18,25 @@ export type Collection<T> = {
 };
 
 export type OutputApi<T extends Collection<any>> = {
-	[K in keyof T]: T[K] extends { "~type": "query" }
+	[K in keyof T]: T[K] extends QueryBrand
 		? {
 				queryOptions: () => T[K] & { queryKey: QueryKey };
 				queryKey: () => QueryKey;
 				pathKey: () => string[];
 			}
-		: T[K] extends { "~type": "mutation" }
+		: T[K] extends Omit<
+					UseMutationOptions<infer TData, infer TError, infer TVariables, infer TContext>,
+					"mutationKey"
+				>
 			? {
-					mutationOptions: () => T[K] & { mutationKey: MutationKey };
+					mutationOptions: <TInnerContext = TContext>(
+						opts?: Omit<
+							UseMutationOptions<TData, TError, TVariables, TInnerContext>,
+							"mutationKey" | "mutationFn"
+						>,
+					) => Omit<UseMutationOptions<TData, TError, TVariables, TContext>, "mutationKey"> & {
+						mutationKey: MutationKey;
+					};
 					mutationKey: () => MutationKey;
 					pathKey: () => string[];
 				}
@@ -57,7 +69,7 @@ export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
 					return () => path;
 				}
 
-				if (value && typeof value === "object" && "queryFn" in value) {
+				if (value && typeof value === "object" && value["~type"] === queryBrand["~type"]) {
 					return {
 						queryOptions: () => ({ ...value, queryKey: currentPath }),
 						queryKey: () => currentPath,
@@ -65,7 +77,7 @@ export function createClient<T extends Collection<T>>(config: T): OutputApi<T> {
 					};
 				}
 
-				if (value && typeof value === "object" && "mutationFn" in value) {
+				if (value && typeof value === "object" && value["~type"] === mutationBrand["~type"]) {
 					return {
 						mutationOptions: () => ({ ...value, mutationKey: currentPath }),
 						mutationKey: () => currentPath,

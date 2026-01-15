@@ -7,6 +7,12 @@ import {
 	type UnusedSkipTokenOptions,
 } from "@tanstack/react-query";
 
+export const queryBrand = {
+	"~type": "query",
+} as const;
+
+export type QueryBrand = typeof queryBrand;
+
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -14,9 +20,7 @@ export function query<
 	TQueryKey extends QueryKey = QueryKey,
 >(
 	options: Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
-): Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & {
-	"~type": "query";
-};
+): Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & QueryBrand;
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -24,9 +28,7 @@ export function query<
 	TQueryKey extends QueryKey = QueryKey,
 >(
 	options: Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
-): Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & {
-	"~type": "query";
-};
+): Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & QueryBrand;
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -34,9 +36,8 @@ export function query<
 	TQueryKey extends QueryKey = QueryKey,
 >(
 	options: Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">,
-): Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> & {
-	"~type": "query";
-};
+): Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey"> &
+	QueryBrand;
 export function query<
 	TQueryFnData = unknown,
 	TError = DefaultError,
@@ -48,14 +49,7 @@ export function query<
 	| Omit<UnusedSkipTokenOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
 	| Omit<DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
 	| Omit<UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey">
-) & { "~type": "query" } {
-	return { ...queryOptions(options), "~type": "query" } as any;
+) &
+	QueryBrand {
+	return { ...queryOptions(options), ...queryBrand } as any;
 }
-
-export type AnyQueryOptions = (
-	| Omit<UndefinedInitialDataOptions<any, any, any, any>, "queryKey">
-	| Omit<DefinedInitialDataOptions<any, any, any, any>, "queryKey">
-	| Omit<UnusedSkipTokenOptions<any, any, any, any>, "queryKey">
-) & {
-	"~type": "query";
-};
