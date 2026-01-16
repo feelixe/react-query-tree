@@ -73,6 +73,7 @@ const usersApi = createApi({
     },
   }),
 });
+
 export const api = createApi({
   todos: todosApi,
   users: usersApi,
