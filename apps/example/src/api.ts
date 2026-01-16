@@ -1,7 +1,7 @@
-import { createClient, mutation, query } from "react-query-tree";
+import { createApi, mutation, query } from "react-query-tree";
 import { getAuthorById, listAuthors, listPosts } from "./db";
 
-export const api = createClient({
+export const api = createApi({
 	authors: {
 		list: query({
 			queryFn: () => {
