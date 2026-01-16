@@ -12,8 +12,15 @@ import type { DeepPartial } from "./types";
 import { mergeMutationOptions } from "./utils";
 
 export type Collection = {
-	[key: string]: QueryBrand | MutationBrand | ((filter: any) => QueryBrand) | Collection;
+	[key: string]:
+		| QueryBrand
+		| MutationBrand
+		| ((filter: any) => QueryBrand)
+		| Collection
+		| OutputApi<any>;
 };
+
+const PROXY_SYMBOL = Symbol("IS_PROXY");
 
 type Query<T> =
 	T extends Omit<
@@ -132,23 +139,21 @@ export type OutputApi<T extends Collection> = {
 			? Mutation<T[K]>
 			: T[K] extends (filter: any) => any
 				? QueryWithFilter<T[K]>
-				: T[K] extends Record<string, any>
-					? OutputApi<T[K]> & { pathKey: () => string[] }
-					: never;
+				: T[K] extends OutputApi<infer U>
+					? OutputApi<U> & { pathKey: () => string[] }
+					: T[K] extends Record<string, any>
+						? OutputApi<T[K]> & { pathKey: () => string[] }
+						: never;
 };
 
-export const createCollection = <T extends Collection>(config: T): T => {
-	return config;
-};
-
-type Prettify<T> = {
-	[K in keyof T]: T[K];
-} & {};
-
-export function createClient<T extends Collection>(config: T): Prettify<OutputApi<T>> {
+export function createApi<T extends Collection>(config: T): OutputApi<T> {
 	const createProxy = (proxyTarget: any, path: string[] = []): any => {
 		return new Proxy(proxyTarget, {
 			get(obj, prop) {
+				if (prop === PROXY_SYMBOL) {
+					return true;
+				}
+
 				if (typeof prop === "symbol" || prop === "toJSON") {
 					return obj[prop];
 				}
@@ -157,6 +162,14 @@ export function createClient<T extends Collection>(config: T): Prettify<OutputAp
 
 				if (prop === "pathKey") {
 					return () => path;
+				}
+
+				if (prop === "config") {
+					return obj;
+				}
+
+				if (value && typeof value === "object" && value[PROXY_SYMBOL]) {
+					return createProxy(value.config, currentPath);
 				}
 
 				if (value && typeof value === "object" && value["~type"] === queryBrand["~type"]) {
