@@ -9,7 +9,7 @@ React Query Tree lets you define your API as a tree of queries and mutations, wi
 **☹️ Traditional method**
 
 - Query keys and path keys are not typed
-- No obvious way to structure collections of queries and mutations to is easily accessible.
+- No obvious way to organize collections of queries and mutations that is structured and accessible.
 
 ```ts
 const todosQuery = useQuery({
