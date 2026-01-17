@@ -25,7 +25,7 @@ const todosQuery = useQuery({
 **🥳 With React Query Tree**
 
 - Single object for accessing all queries and mutations
-- Query keys are typed which makes invalidation a breeze
+- Query keys are typed, making invalidation a breeze
 
 **api.ts**
 
@@ -111,7 +111,7 @@ const todosApi = createApi({
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: api.todos.pathKey() });
+      queryClient.invalidateQueries({ queryKey: todosApi.list.queryKey() });
     },
   }),
 });
