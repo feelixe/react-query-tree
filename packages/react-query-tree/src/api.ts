@@ -11,15 +11,6 @@ import { type QueryBrand, queryBrand } from "./query";
 import type { DeepPartial } from "./types";
 import { mergeMutationOptions } from "./utils";
 
-export type Collection = {
-	[key: string]:
-		| QueryBrand
-		| MutationBrand
-		| ((filter: any) => QueryBrand)
-		| Collection
-		| OutputApi<any>;
-};
-
 const PROXY_SYMBOL = Symbol("IS_PROXY");
 
 type Query<T> =
@@ -132,7 +123,16 @@ type Mutation<T> =
 			}
 		: never;
 
-export type OutputApi<T extends Collection> = {
+export type Config = {
+	[key: string]:
+		| QueryBrand
+		| MutationBrand
+		| ((filter: any) => QueryBrand)
+		| Config
+		| OutputApi<any>;
+};
+
+export type OutputApi<T extends Config> = {
 	[K in keyof T]: T[K] extends { "~type": "query" }
 		? Query<T[K]>
 		: T[K] extends { "~type": "mutation" }
@@ -146,7 +146,7 @@ export type OutputApi<T extends Collection> = {
 						: never;
 };
 
-export function createApi<T extends Collection>(config: T): OutputApi<T> {
+export function createApi<T extends Config>(config: T): OutputApi<T> {
 	const createProxy = (proxyTarget: any, path: string[] = []): any => {
 		return new Proxy(proxyTarget, {
 			get(obj, prop) {
